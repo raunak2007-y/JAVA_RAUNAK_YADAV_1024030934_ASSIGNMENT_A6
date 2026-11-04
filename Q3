@@ -1,0 +1,60 @@
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
+class Employee implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private int id;
+    private String name;
+    private String department;
+    private double salary;
+
+    public Employee(int id, String name, String department, double salary) {
+        this.id = id;
+        this.name = name;
+        this.department = department;
+        this.salary = salary;
+    }
+
+    @Override
+    public String toString() {
+        return "Employee [ID=" + id + ", Name=" + name + ", Department=" + department + ", Salary=$" + salary + "]";
+    }
+}
+
+public class EmployeeSerializationDemo {
+    public static void main(String[] args) {
+        String filepath = "employee_records.ser";
+
+        List<Employee> employeesToWrite = new ArrayList<>();
+        employeesToWrite.add(new Employee(201, "John Doe", "Engineering", 85000));
+        employeesToWrite.add(new Employee(202, "Jane Smith", "Human Resources", 62000));
+        employeesToWrite.add(new Employee(203, "David Lee", "Finance", 95000));
+
+        System.out.println("--- Starting Serialization ---");
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filepath))) {
+            oos.writeObject(employeesToWrite);
+            System.out.println("Successfully serialized and saved " + employeesToWrite.size() + " employees.");
+        } catch (IOException e) {
+            System.err.println("Serialization Error: " + e.getMessage());
+        }
+
+        System.out.println("\n--- Starting Deserialization ---");
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(filepath))) {
+            @SuppressWarnings("unchecked")
+            List<Employee> deserializedEmployees = (List<Employee>) ois.readObject();
+            
+            System.out.println("Retrieved employee records:");
+            for (Employee emp : deserializedEmployees) {
+                System.out.println(emp);
+            }
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println("Deserialization Error: " + e.getMessage());
+        }
+    }
+}
