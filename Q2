@@ -1,0 +1,60 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
+public class LogAnalyzer {
+    public static void main(String[] args) {
+        String logInputFile = "app_activity.log";
+        String filteredOutputFile = "filtered_errors_warnings.log";
+
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter(logInputFile))) {
+            bw.write("[2026-11-04 10:00:00] INFO: Application started successfully.\n");
+            bw.write("[2026-11-04 10:05:23] WARNING: High memory usage detected above 80%.\n");
+            bw.write("[2026-11-04 10:06:12] INFO: Database connection active.\n");
+            bw.write("[2026-11-04 10:10:45] ERROR: Failed to connect to payment gateway API.\n");
+            bw.write("[2026-11-04 10:15:00] INFO: User 'admin' logged out.\n");
+            bw.write("[2026-11-04 10:18:22] ERROR: NullPointerException in UserSessionController.\n");
+        } catch (IOException ignored) {}
+
+        int totalEntries = 0;
+        int errorCount = 0;
+        int warningCount = 0;
+
+        System.out.println("Starting log analysis...");
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(logInputFile));
+             BufferedWriter writer = new BufferedWriter(new FileWriter(filteredOutputFile))) {
+
+            String line;
+            while ((line = reader.readLine()) != null) {
+                totalEntries++;
+                boolean matchFound = false;
+
+                if (line.contains("ERROR")) {
+                    errorCount++;
+                    matchFound = true;
+                } else if (line.contains("WARNING")) {
+                    warningCount++;
+                    matchFound = true;
+                }
+
+                if (matchFound) {
+                    writer.write(line);
+                    writer.newLine();
+                }
+            }
+            writer.flush();
+
+            System.out.println("\n--- Analysis Summary ---");
+            System.out.println("Total Log Entries Processed: " + totalEntries);
+            System.out.println("Total ERROR Logs Found     : " + errorCount);
+            System.out.println("Total WARNING Logs Found   : " + warningCount);
+            System.out.println("Filtered alerts successfully saved to: " + filteredOutputFile);
+
+        } catch (IOException e) {
+            System.err.println("Error processing files: " + e.getMessage());
+        }
+    }
+}
