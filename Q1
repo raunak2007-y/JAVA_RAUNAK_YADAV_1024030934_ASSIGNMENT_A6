@@ -1,0 +1,49 @@
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
+public class StudentFileManagement {
+    public static void main(String[] args) {
+        String textFile = "student_details.txt";
+        String sourceBinary = "source_image.dat";
+        String destBinary = "copied_image.dat";
+
+        System.out.println("--- Task 1: Character Streams ---");
+        try (FileWriter writer = new FileWriter(textFile);
+             FileReader reader = new FileReader(textFile)) {
+            
+            writer.write("Roll No: 101, Name: Alice, Course: Computer Science\n");
+            writer.write("Roll No: 102, Name: Bob, Course: Information Technology\n");
+            writer.flush();
+            System.out.println("Student details written successfully to " + textFile);
+
+            System.out.println("\nReading student details from file:");
+            int character;
+            while ((character = reader.read()) != -1) {
+                System.print((char) character);
+            }
+        } catch (IOException e) {
+            System.err.println("Error during character stream operation: " + e.getMessage());
+        }
+
+        try (FileOutputStream fos = new FileOutputStream(sourceBinary)) {
+            fos.write(new byte[]{65, 66, 67, 68, 69});
+        } catch (IOException ignored) {}
+
+        System.out.println("\n--- Task 2: Byte Streams ---");
+        try (FileInputStream fin = new FileInputStream(sourceBinary);
+             FileOutputStream fout = new FileOutputStream(destBinary)) {
+            
+            byte[] buffer = new byte[1024];
+            int bytesRead;
+            while ((bytesRead = fin.read(buffer)) != -1) {
+                fout.write(buffer, 0, bytesRead);
+            }
+            System.out.println("Binary file copied successfully from '" + sourceBinary + "' to '" + destBinary + "'");
+        } catch (IOException e) {
+            System.err.println("Error during byte stream operation: " + e.getMessage());
+        }
+    }
+}
